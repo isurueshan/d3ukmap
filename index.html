@@ -1,0 +1,126 @@
+<!DOCTYPE html >
+<html>
+<head>
+    <meta charset="utf-8">
+    <script type ="text/javascript" src="d3.v4.js"></script>
+    <style>
+        body {
+            background: #010101;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+.country{
+    fill:#045041;
+    stroke: #150753;
+        stroke-width: 0.5;
+}
+        .towns{
+            /* fill: rgba(154, 244, 20, 0.74);
+        stroke: rgb(208, 208, 208); */
+        stroke-width: 1px;
+        /* background-image: url(map.png); */
+background-repeat: no-repeat;
+width: 25px;
+/* height: 20px; */
+
+        }
+.city_name{
+    fill:white;
+    font-size: 10px;
+}
+
+
+
+    </style>
+</head>
+
+
+<body>
+<div id="map">
+
+</div>
+<script>
+ var margin = {top: 0, left:0,right:0,bottom:0},
+ height = 900,
+ width = 900;
+ 
+ var svg = d3.select("#map")
+ .append("svg")
+ .attr("height", height)
+ .attr("width", width)
+ .append("g")
+ .attr("id","svg_id");
+
+var prjctn = d3.geoNaturalEarth1()
+.translate([width/2, height/2])
+ .scale(3000)
+ .center([-5, 53])
+var path = d3.geoPath().projection(prjctn);
+//UK MAP
+ d3.json('https://yamu.pro/gb.json', function(error, data) {
+console.log(data);
+
+svg.selectAll(".country")
+.data(data.features)
+.enter().append("path")
+.attr("class","country")
+.attr("d",path)
+.append('title')
+.text("Great Britain");
+ });
+
+ d3.json('https://git.1ws.app/youtube/uk_cities.json', function(error, data) {
+console.log(data);
+svg.selectAll('.towns')
+.data(data)
+.enter().append('svg:image')
+.attr("class","towns")  .attr("transform", function (d) {
+          return "translate(" + -20 / 2 + "," + -20 / 2 + ")";
+        }) .attr("xlink:href", function (d) {
+          return 'map.png';
+        })
+// .attr("r", function(f){ 
+//     var pop = f.Population/10000
+//     console.log(pop);
+//     return 10;
+// })
+.attr("x",function(d){
+    console.log(d);
+    var coords = prjctn([d.lng, d.lat])
+    return coords[0];
+})
+.attr("y",function(d){
+    var coords = prjctn([d.lng, d.lat])
+    return coords[1]
+})
+//City Name
+svg.selectAll('city_name')
+.data(data)
+.enter()
+.append('text')
+.attr('class','city_name')
+.attr("x",function(d){
+    console.log(d);
+    var coords = prjctn([d.lng, d.lat, d.Town])
+    return coords[0];
+})
+.attr("y",function(d){
+    var coords = prjctn([d.lng, d.lat,d.Town])
+    return coords[1]
+}).text(function(d){
+    var coords = prjctn([d.lng, d.lat,d.Town])
+    console.log(d.Town);
+    return d.Town;
+})
+.attr('dx','15')
+.attr('dy','10')
+
+ });
+
+
+
+</script>
+
+</body>
+</html>
